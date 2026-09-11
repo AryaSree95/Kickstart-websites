@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Understanding Technology — Interactive Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12151A;
+    --panel:#1B1F26;
+    --panel-2:#232833;
+    --line:#2E3440;
+    --line-soft:#242933;
+    --text:#E7E9EE;
+    --muted:#9AA3B2;
+    --muted-2:#6B7280;
+    --core:#E8A33D;
+    --security:#F0665E;
+    --design:#8C8CF9;
+    --cloud:#43C59E;
+    --python:#4B8BF4;
+    --pass:#43C59E;
+    --fail:#F0665E;
+    --radius:10px;
+    --radius-sm:6px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', system-ui, sans-serif; margin:0; font-weight:700;}
+  code, .mono, .demo-log, .badge, .tabs button, .progress{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  ::selection{background:var(--core); color:#12151A;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    max-width:900px;
+    margin:0 auto;
+    padding:72px 24px 40px;
+  }
+  .hero h1{
+    font-size:clamp(28px, 4vw, 44px);
+    letter-spacing:-0.01em;
+    max-width:14ch;
+  }
+  .hero p{
+    color:var(--muted);
+    max-width:62ch;
+    font-size:16px;
+    margin-top:16px;
+  }
+  .hero .foot-note{
+    color:var(--muted-2);
+    font-size:13px;
+    margin-top:24px;
+    border-top:1px solid var(--line-soft);
+    padding-top:16px;
+  }
+  .progress{
+    display:inline-flex;
+    gap:8px;
+    align-items:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-top:20px;
+  }
+  .progress .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--line);
+    display:inline-block;
+  }
+  .progress .dot.on{background:var(--core);}
+
+  /* ---------- Tabs ---------- */
+  .tabs{
+    position:sticky; top:0; z-index:20;
+    display:flex; gap:4px; overflow-x:auto;
+    background:rgba(18,21,26,0.92);
+    backdrop-filter:blur(6px);
+    border-top:1px solid var(--line-soft);
+    border-bottom:1px solid var(--line-soft);
+    padding:10px 24px;
+  }
+  .tabs button{
+    flex:0 0 auto;
+    background:transparent;
+    border:1px solid transparent;
+    color:var(--muted);
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:13px;
+    cursor:pointer;
+    transition:color .15s, border-color .15s, background .15s;
+  }
+  .tabs button:hover{color:var(--text);}
+  .tabs button.active{
+    color:var(--text);
+    border-color:var(--line);
+    background:var(--panel);
+  }
+
+  main{max-width:1000px; margin:0 auto; padding:8px 24px 40px;}
+
+  .cat-section{padding:48px 0 16px; scroll-margin-top:64px;}
+  .cat-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+  .cat-head .swatch{width:10px; height:10px; border-radius:2px; flex:0 0 auto;}
+  .cat-head h2{font-size:22px;}
+  .cat-section > p{color:var(--muted); font-size:14.5px; max-width:60ch; margin:8px 0 24px;}
+
+  .demo-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:14px;
+  }
+  .card{
+    text-align:left;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-left:3px solid var(--card-accent, var(--core));
+    border-radius:var(--radius);
+    padding:16px 16px 14px;
+    color:var(--text);
+    cursor:pointer;
+    font:inherit;
+    display:flex; flex-direction:column; gap:8px;
+    min-height:118px;
+    transition:border-color .15s, transform .15s, background .15s;
+  }
+  .card:hover{background:var(--panel-2); transform:translateY(-1px);}
+  .card:focus-visible{outline:2px solid var(--text); outline-offset:2px;}
+  .card h3{font-size:15px; font-weight:600; font-family:'IBM Plex Sans', sans-serif;}
+  .card p{margin:0; color:var(--muted); font-size:13px; flex:1;}
+  .card .row{display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--muted-2);}
+  .card .check{opacity:0; transition:opacity .15s;}
+  .card.visited .check{opacity:1; color:var(--pass);}
+
+  footer{
+    max-width:900px; margin:0 auto; padding:32px 24px 64px;
+    color:var(--muted-2); font-size:13px;
+    border-top:1px solid var(--line-soft);
+  }
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(8,10,13,0.72);
+    display:none; align-items:flex-start; justify-content:center;
+    padding:48px 16px; overflow-y:auto; z-index:100;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    width:100%; max-width:620px;
+    padding:28px;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:16px; right:16px;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--muted);
+    width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:15px; line-height:1;
+  }
+  .modal-close:hover{color:var(--text);}
+  .modal-eyebrow{font-size:12.5px; color:var(--muted-2); margin-bottom:6px;}
+  .modal h3{font-size:20px; margin-bottom:14px;}
+  .modal .body{font-size:14px; color:var(--text);}
+  .modal .body p{color:var(--muted); font-size:13.5px;}
+
+  /* ---------- shared demo controls ---------- */
+  .btn{
+    background:var(--core); color:#1A1200; border:none;
+    padding:9px 16px; border-radius:var(--radius-sm); font-weight:600; font-size:13.5px;
+    cursor:pointer; font-family:'IBM Plex Sans', sans-serif;
+  }
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+  .btn.secondary{background:var(--panel-2); color:var(--text); border:1px solid var(--line);}
+  .field{
+    width:100%; background:var(--ink); border:1px solid var(--line); color:var(--text);
+    padding:9px 11px; border-radius:var(--radius-sm); font-size:14px; font-family:inherit;
+  }
+  .field:focus{outline:1px solid var(--muted);}
+  .demo-log{
+    background:var(--ink); border:1px solid var(--line-soft); border-radius:8px;
+    padding:12px 14px; font-size:12.5px; color:var(--muted); min-height:44px;
+    white-space:pre-wrap; margin-top:12px; max-height:220px; overflow-y:auto;
+  }
+  .badge{
+    display:inline-block; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:500;
+  }
+  .badge.pass{background:rgba(67,197,158,.15); color:var(--pass);}
+  .badge.fail{background:rgba(240,102,94,.15); color:var(--fail);}
+  .row-flex{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+  .stage-row{display:flex; gap:8px; margin:16px 0;}
+  .stage{
+    flex:1; text-align:center; padding:12px 6px; border-radius:8px; border:1px solid var(--line);
+    background:var(--ink); font-size:13px; color:var(--muted); transition:.25s;
+  }
+  .stage.active{border-color:var(--core); color:var(--text); background:rgba(232,163,61,.08);}
+  .stage.pass{border-color:var(--pass); color:var(--pass); background:rgba(67,197,158,.08);}
+  .stage.fail{border-color:var(--fail); color:var(--fail); background:rgba(240,102,94,.08);}
+  .bar-track{background:var(--ink); border:1px solid var(--line); border-radius:999px; height:8px; overflow:hidden;}
+  .bar-fill{height:100%; width:0%; transition:width .3s;}
+  .grid-boxes{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0;}
+  .box{
+    width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+    border:1px solid var(--line); border-radius:6px; font-size:11.5px; color:var(--muted); background:var(--ink);
+  }
+  .box.check-hit{border-color:var(--core); color:var(--core); background:rgba(232,163,61,.12);}
+  .box.match{border-color:var(--pass); color:var(--pass); background:rgba(67,197,158,.15);}
+  label.small{font-size:12.5px; color:var(--muted); display:flex; gap:6px; align-items:center;}
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important; animation:none !important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Understanding technology, one demo at a time</h1>
+  <p>Sixteen small interactive demos covering the ideas behind the apps you use every day — from how a login actually works to what happens when you push code. Click a card, try the demo, see what's happening underneath. No real data leaves this page.</p>
+  <div class="progress" id="progressLine">
+    <span id="progressText">0 of 16 opened</span>
+  </div>
+  <p class="foot-note">Coding Foundations Lab · Core concepts, Cybersecurity, UI/UX, DevOps &amp; AWS, and Python</p>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button data-target="sec-core" class="active">Core Concepts</button>
+  <button data-target="sec-security">Cybersecurity</button>
+  <button data-target="sec-design">UI/UX</button>
+  <button data-target="sec-cloud">DevOps &amp; AWS</button>
+  <button data-target="sec-python">Python</button>
+</nav>
+
+<main>
+  <section class="cat-section" id="sec-core" data-cat="core">
+    <div class="cat-head"><span class="swatch" style="background:var(--core)"></span><h2>Core Concepts</h2></div>
+    <p>The building blocks almost every application is made of, however new the framework on top.</p>
+    <div class="demo-grid" id="grid-core"></div>
+  </section>
+
+  <section class="cat-section" id="sec-security" data-cat="security">
+    <div class="cat-head"><span class="swatch" style="background:var(--security)"></span><h2>Cybersecurity</h2></div>
+    <p>Thinking like an attacker for five minutes is one of the fastest ways to learn to defend against one.</p>
+    <div class="demo-grid" id="grid-security"></div>
+  </section>
+
+  <section class="cat-section" id="sec-design" data-cat="design">
+    <div class="cat-head"><span class="swatch" style="background:var(--design)"></span><h2>UI/UX</h2></div>
+    <p>Interfaces are a series of decisions made visible. Here's how a couple of those decisions get checked.</p>
+    <div class="demo-grid" id="grid-design"></div>
+  </section>
+
+  <section class="cat-section" id="sec-cloud" data-cat="cloud">
+    <div class="cat-head"><span class="swatch" style="background:var(--cloud)"></span><h2>DevOps &amp; AWS</h2></div>
+    <p>What actually happens between "git push" and a change going live.</p>
+    <div class="demo-grid" id="grid-cloud"></div>
+  </section>
+
+  <section class="cat-section" id="sec-python" data-cat="python">
+    <div class="cat-head"><span class="swatch" style="background:var(--python)"></span><h2>Python</h2></div>
+    <p>Small experiments that explain why Python code behaves the way it does.</p>
+    <div class="demo-grid" id="grid-python"></div>
+  </section>
+</main>
+
+<footer>
+  Built as a hands-on companion to a coding course — extended with Cybersecurity, UI/UX, DevOps/AWS, and Python modules alongside the original core-concepts demos.
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+    <div class="modal-eyebrow" id="modalCat"></div>
+    <h3 id="modalTitle"></h3>
+    <div class="body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CATS = {
+    core:{label:"Core Concepts", color:"var(--core)"},
+    security:{label:"Cybersecurity", color:"var(--security)"},
+    design:{label:"UI/UX", color:"var(--design)"},
+    cloud:{label:"DevOps & AWS", color:"var(--cloud)"},
+    python:{label:"Python", color:"var(--python)"}
+  };
+
+  var CARDS = [
+    {id:"api", cat:"core", title:"API request/response", blurb:"Send a mock request and watch the round trip happen."},
+    {id:"db", cat:"core", title:"Database query", blurb:"Filter a table live and see only the matching rows."},
+    {id:"cache", cat:"core", title:"Caching", blurb:"Fetch the same data twice — see why the second time is instant."},
+    {id:"auth", cat:"core", title:"Authentication", blurb:"Log in and watch a token get issued and decoded."},
+    {id:"crypto", cat:"core", title:"Encryption", blurb:"Turn text into ciphertext and back, step by step."},
+    {id:"git", cat:"core", title:"Version control", blurb:"Branch, commit, and merge on a visual timeline."},
+    {id:"lb", cat:"core", title:"Load balancing", blurb:"Send a batch of requests and watch them spread across servers."},
+    {id:"phish", cat:"security", title:"Spot the phishing email", blurb:"Click on the details that give a fake email away."},
+    {id:"pwd", cat:"security", title:"Password strength & hashing", blurb:"Type a password and see its strength — and its hash."},
+    {id:"contrast", cat:"design", title:"Contrast checker", blurb:"Pick two colors and test them against accessibility guidelines."},
+    {id:"wireframe", cat:"design", title:"Wireframe to prototype", blurb:"Step the same screen through three stages of fidelity."},
+    {id:"cicd", cat:"cloud", title:"CI/CD pipeline", blurb:"Push code and watch it build, test, and deploy — or fail."},
+    {id:"docker", cat:"cloud", title:"Docker container lifecycle", blurb:"Build, run, stop, and remove a container step by step."},
+    {id:"s3", cat:"cloud", title:"AWS S3 permissions", blurb:"Toggle a bucket's visibility and see who gets access."},
+    {id:"listdict", cat:"python", title:"List vs. dictionary lookup", blurb:"Compare how many steps each takes to find a value."},
+    {id:"types", cat:"python", title:"Data types playground", blurb:"Type a value and see what Python thinks it is."}
+  ];
+
+  var visited = new Set();
+
+  function $(sel, el){ return (el||document).querySelector(sel); }
+  function el(tag, attrs, children){
+    var n = document.createElement(tag);
+    attrs = attrs || {};
+    Object.keys(attrs).forEach(function(k){
+      if(k === "class") n.className = attrs[k];
+      else if(k === "html") n.innerHTML = attrs[k];
+      else if(k.indexOf("on") === 0) n.addEventListener(k.slice(2), attrs[k]);
+      else n.setAttribute(k, attrs[k]);
+    });
+    (children||[]).forEach(function(c){ if(c) n.appendChild(c); });
+    return n;
+  }
+
+  /* ---------- render cards ---------- */
+  CARDS.forEach(function(c){
+    var grid = document.getElementById("grid-" + c.cat);
+    var card = el("button", {
+      class:"card",
+      style:"--card-accent:" + CATS[c.cat].color,
+      "data-id":c.id,
+      onclick:function(){ openModal(c.id); }
+    }, [
+      el("h3", {}, [document.createTextNode(c.title)]),
+      el("p", {}, [document.createTextNode(c.blurb)]),
+      el("div", {class:"row"}, [
+        el("span", {}, [document.createTextNode("Click to try it")]),
+        el("span", {class:"check"}, [document.createTextNode("✓ opened")])
+      ])
+    ]);
+    grid.appendChild(card);
+  });
+
+  function markVisited(id){
+    visited.add(id);
+    var card = document.querySelector('.card[data-id="' + id + '"]');
+    if(card) card.classList.add("visited");
+    document.getElementById("progressText").textContent = visited.size + " of " + CARDS.length + " opened";
+  }
+
+  /* ---------- tabs ---------- */
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll("#tabs button"));
+  tabButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabButtons.forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById(btn.getAttribute("data-target")).scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  });
+  var sections = Array.prototype.slice.call(document.querySelectorAll(".cat-section"));
+  if("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          tabButtons.forEach(function(b){
+            b.classList.toggle("active", b.getAttribute("data-target") === entry.target.id);
+          });
+        }
+      });
+    }, {rootMargin:"-40% 0px -55% 0px"});
+    sections.forEach(function(s){ io.observe(s); });
+  }
+
+  /* ---------- modal ---------- */
+  var overlay = document.getElementById("overlay");
+  var modalBody = document.getElementById("modalBody");
+  var modalTitle = document.getElementById("modalTitle");
+  var modalCat = document.getElementById("modalCat");
+  var lastFocused = null;
+
+  function openModal(id){
+    var card = CARDS.filter(function(c){ return c.id === id; })[0];
+    modalTitle.textContent = card.title;
+    modalCat.textContent = CATS[card.cat].label;
+    modalBody.innerHTML = "";
+    DEMOS[id](modalBody);
+    overlay.classList.add("open");
+    lastFocused = document.activeElement;
+    document.getElementById("modalClose").focus();
+    markVisited(id);
+  }
+  function closeModal(){
+    overlay.classList.remove("open");
+    modalBody.innerHTML = "";
+    if(lastFocused) lastFocused.focus();
+  }
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  overlay.addEventListener("click", function(e){ if(e.target === overlay) closeModal(); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && overlay.classList.contains("open")) closeModal(); });
+
+  /* ================= DEMOS ================= */
+  var DEMOS = {};
+
+  /* ---- API request/response ---- */
+  DEMOS.api = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Every button tap on an app usually sends a request to a server, which sends back a response. Watch it happen below.")]));
+    var log = el("div", {class:"demo-log"}, [document.createTextNode("Ready.")]);
+    var btn = el("button", {class:"btn"}, [document.createTextNode("Send request")]);
+    root.appendChild(el("div", {class:"row-flex"}, [btn]));
+    root.appendChild(log);
+    btn.addEventListener("click", function(){
+      btn.disabled = true;
+      log.textContent = "→ GET /api/courses/42";
+      setTimeout(function(){
+        log.textContent += "\n… server received request, looking up course 42";
+      }, 500);
+      setTimeout(function(){
+        log.textContent += "\n← 200 OK\n" + JSON.stringify({id:42, title:"Intro to Python", students:118}, null, 2);
+        btn.disabled = false;
+      }, 1200);
+    });
+  };
+
+  /* ---- Database query ---- */
+  DEMOS.db = function(root){
+    var rows = [
+      {name:"Ava", age:22, track:"Web"},
+      {name:"Ben", age:29, track:"Cloud"},
+      {name:"Cy", age:19, track:"Web"},
+      {name:"Dee", age:34, track:"Security"},
+      {name:"Eli", age:26, track:"Data"}
+    ];
+    root.appendChild(el("p", {}, [document.createTextNode("This is what a query does to a table: it decides which rows make it into the result.")]));
+    var select = el("select", {class:"field"});
+    ["All rows", "age > 25", "track = Web"].forEach(function(v){
+      select.appendChild(el("option", {value:v}, [document.createTextNode(v)]));
+    });
+    root.appendChild(select);
+    var table = el("div", {class:"demo-log"});
+    root.appendChild(table);
+    function render(){
+      var filter = select.value;
+      var filtered = rows.filter(function(r){
+        if(filter === "age > 25") return r.age > 25;
+        if(filter === "track = Web") return r.track === "Web";
+        return true;
+      });
+      var text = "SELECT * FROM students WHERE " + (filter === "All rows" ? "1=1" : filter) + ";\n\n";
+      text += "name   age  track\n" + filtered.map(function(r){
+        return r.name.padEnd(7) + String(r.age).padEnd(5) + r.track;
+      }).join("\n");
+      table.textContent = text + "\n\n" + filtered.length + " of " + rows.length + " rows returned";
+    }
+    select.addEventListener("change", render);
+    render();
+  };
+
+  /* ---- Caching ---- */
+  DEMOS.cache = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("The first fetch does real work. If nothing changed, the second fetch can reuse the answer instead of redoing it.")]));
+    var cached = false;
+    var log = el("div", {class:"demo-log"}, [document.createTextNode("Nothing fetched yet.")]);
+    var btn = el("button", {class:"btn"}, [document.createTextNode("Fetch /api/profile")]);
+    root.appendChild(btn);
+    root.appendChild(log);
+    btn.addEventListener("click", function(){
+      btn.disabled = true;
+      var start = performance.now();
+      var delay = cached ? 0 : 1100;
+      setTimeout(function(){
+        var ms = Math.round(performance.now() - start);
+        log.textContent = (cached ? "CACHE HIT" : "CACHE MISS — fetched from server") + "\nResponded in ~" + (cached ? Math.max(ms,2) : ms) + "ms";
+        cached = true;
+        btn.disabled = false;
+      }, delay);
+    });
+  };
+
+  /* ---- Authentication ---- */
+  DEMOS.auth = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Logging in checks your credentials once, then hands you a token that proves who you are on later requests.")]));
+    var user = el("input", {class:"field", placeholder:"Username", style:"margin-bottom:8px;"});
+    var pass = el("input", {class:"field", placeholder:"Password", type:"password", style:"margin-bottom:8px;"});
+    var btn = el("button", {class:"btn"}, [document.createTextNode("Log in")]);
+    var log = el("div", {class:"demo-log"}, [document.createTextNode("Enter any username and password.")]);
+    root.appendChild(user); root.appendChild(pass); root.appendChild(btn); root.appendChild(log);
+    btn.addEventListener("click", function(){
+      if(!user.value || !pass.value){ log.textContent = "Enter a username and password first."; return; }
+      log.textContent = "Verifying credentials…";
+      setTimeout(function(){
+        log.textContent += "\nCredentials OK. Issuing token…";
+        setTimeout(function(){
+          var token = {header:{alg:"HS256"}, payload:{user:user.value, role:"student", exp:"1h"}};
+          log.textContent += "\n\nToken issued:\neyJhbGciOi...(signature)\n\nDecoded payload:\n" + JSON.stringify(token.payload, null, 2);
+        }, 500);
+      }, 500);
+    });
+  };
+
+  /* ---- Encryption ---- */
+  DEMOS.crypto = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("A simplified shift cipher, so you can see the idea of scrambling and unscrambling. Real systems use much stronger math, like AES or RSA.")]));
+    var input = el("input", {class:"field", placeholder:"Type a message", style:"margin-bottom:8px;"});
+    var out = el("div", {class:"demo-log"}, [document.createTextNode("Ciphertext will appear here.")]);
+    var encBtn = el("button", {class:"btn"}, [document.createTextNode("Encrypt")]);
+    var decBtn = el("button", {class:"btn secondary"}, [document.createTextNode("Decrypt")]);
+    root.appendChild(input);
+    root.appendChild(el("div", {class:"row-flex"}, [encBtn, decBtn]));
+    root.appendChild(out);
+    function shift(str, n){
+      return str.replace(/[a-zA-Z]/g, function(ch){
+        var base = ch <= "Z" ? 65 : 97;
+        return String.fromCharCode(((ch.charCodeAt(0) - base + n + 26) % 26) + base);
+      });
+    }
+    encBtn.addEventListener("click", function(){
+      out.textContent = "Ciphertext: " + shift(input.value, 3);
+    });
+    decBtn.addEventListener("click", function(){
+      out.textContent = "Decrypted: " + shift(input.value, -3);
+    });
+  };
+
+  /* ---- Version control ---- */
+  DEMOS.git = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("A commit history is just a timeline. Branching lets you work in parallel; merging brings the work back together.")]));
+    var main = ["Initial commit", "Add login page"];
+    var branch = [];
+    var merged = false;
+    var timeline = el("div", {class:"demo-log"});
+    var branchBtn = el("button", {class:"btn"}, [document.createTextNode("Create branch")]);
+    var commitBtn = el("button", {class:"btn secondary"}, [document.createTextNode("Commit to branch")]);
+    var mergeBtn = el("button", {class:"btn secondary"}, [document.createTextNode("Merge branch")]);
+    commitBtn.disabled = true; mergeBtn.disabled = true;
+    root.appendChild(el("div", {class:"row-flex"}, [branchBtn, commitBtn, mergeBtn]));
+    root.appendChild(timeline);
+    function render(){
+      var t = "main:   " + main.map(function(m,i){ return "(" + (i+1) + ") " + m; }).join(" — ");
+      if(branch.length || branchBtn.disabled){
+        t += "\nbranch: " + (branch.length ? branch.map(function(m,i){ return "(b" + (i+1) + ") " + m; }).join(" — ") : "(created, no commits yet)");
+      }
+      if(merged) t += "\n\nBranch merged into main.";
+      timeline.textContent = t;
+    }
+    branchBtn.addEventListener("click", function(){
+      branchBtn.disabled = true; commitBtn.disabled = false; render();
+    });
+    commitBtn.addEventListener("click", function(){
+      branch.push("Branch commit " + (branch.length + 1));
+      if(branch.length >= 2){ commitBtn.disabled = true; mergeBtn.disabled = false; }
+      render();
+    });
+    mergeBtn.addEventListener("click", function(){
+      main = main.concat(branch, ["Merge branch"]);
+      branch = []; merged = true; mergeBtn.disabled = true;
+      render();
+    });
+    render();
+  };
+
+  /* ---- Load balancing ---- */
+  DEMOS.lb = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("One server can only handle so much. A load balancer spreads incoming requests across several.")]));
+    var counts = [0,0,0];
+    var down = [false,false,false];
+    var serverRow = el("div", {class:"row-flex"});
+    var boxes = counts.map(function(_, i){
+      var b = el("div", {class:"stage"}, [document.createTextNode("Server " + (i+1) + ": 0")]);
+      serverRow.appendChild(b);
+      return b;
+    });
+    root.appendChild(serverRow);
+    var toggle = el("label", {class:"small"}, [
+      el("input", {type:"checkbox", onchange:function(e){ down[1] = e.target.checked; renderState(); }}),
+      document.createTextNode("Take Server 2 offline")
+    ]);
+    root.appendChild(toggle);
+    var log = el("div", {class:"demo-log"}, [document.createTextNode("Send a batch to see requests distributed.")]);
+    var btn = el("button", {class:"btn"}, [document.createTextNode("Send 6 requests")]);
+    root.appendChild(btn);
+    root.appendChild(log);
+    function renderState(){
+      boxes.forEach(function(b, i){
+        b.textContent = "Server " + (i+1) + ": " + counts[i] + (down[i] ? " (offline)" : "");
+        b.classList.toggle("fail", down[i]);
+      });
+    }
+    btn.addEventListener("click", function(){
+      var active = [0,1,2].filter(function(i){ return !down[i]; });
+      var msgs = [];
+      for(var i=0;i<6;i++){
+        var target = active[i % active.length];
+        counts[target]++;
+        msgs.push("request " + (i+1) + " → server " + (target+1));
+      }
+      log.textContent = msgs.join("\n");
+      renderState();
+    });
+    renderState();
+  };
+
+  /* ---- Phishing email ---- */
+  DEMOS.phish = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Click on the parts of this email that give away that it's fake. Find all 4.")]));
+    var found = new Set();
+    var counter = el("div", {class:"demo-log"}, [document.createTextNode("0 of 4 red flags found.")]);
+    var flags = {
+      sender:"This address only looks official — the real domain is misspelled.",
+      urgency:"Urgent, threatening language is a classic pressure tactic.",
+      link:"Hover-checking a link before clicking would reveal a different destination.",
+      greeting:"A generic greeting suggests this wasn't sent by someone who knows you."
+    };
+    function spot(key, label){
+      var s = el("span", {
+        style:"cursor:pointer; border-bottom:1px dashed var(--muted-2);",
+        onclick:function(){
+          if(found.has(key)) return;
+          found.add(key);
+          s.style.background = "rgba(240,102,94,.18)";
+          s.style.borderBottomColor = "var(--security)";
+          counter.textContent = found.size + " of 4 red flags found." + (found.size ? "\n\n" + Array.from(found).map(function(k){ return "• " + flags[k]; }).join("\n") : "");
+        }
+      }, [document.createTextNode(label)]);
+      return s;
+    }
+    var email = el("div", {class:"demo-log", style:"color:var(--text); line-height:1.7;"});
+    email.appendChild(document.createTextNode("From: "));
+    email.appendChild(spot("sender", "support@paypa1-secure.com"));
+    email.appendChild(document.createTextNode("\n\n"));
+    email.appendChild(spot("greeting", "Dear Customer,"));
+    email.appendChild(document.createTextNode("\n\n"));
+    email.appendChild(spot("urgency", "Your account will be suspended in 24 hours unless you verify now."));
+    email.appendChild(document.createTextNode("\n\n"));
+    email.appendChild(spot("link", "Click here to verify your account →"));
+    root.appendChild(email);
+    root.appendChild(counter);
+  };
+
+  /* ---- Password strength ---- */
+  DEMOS.pwd = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Type a password to see how its strength is estimated, and a simplified stand-in for what a hash looks like (not real SHA-256).")]));
+    var input = el("input", {class:"field", type:"text", placeholder:"Type a password"});
+    root.appendChild(input);
+    var barTrack = el("div", {class:"bar-track", style:"margin-top:10px;"});
+    var barFill = el("div", {class:"bar-fill"});
+    barTrack.appendChild(barFill);
+    root.appendChild(barTrack);
+    var label = el("div", {class:"demo-log"});
+    root.appendChild(label);
+    function hash(str){
+      var h = 5381;
+      for(var i=0;i<str.length;i++){ h = ((h*33) ^ str.charCodeAt(i)) >>> 0; }
+      return h.toString(16).padStart(8, "0") + h.toString(16).split("").reverse().join("");
+    }
+    input.addEventListener("input", function(){
+      var v = input.value;
+      var score = 0;
+      if(v.length >= 8) score++;
+      if(v.length >= 12) score++;
+      if(/[A-Z]/.test(v)) score++;
+      if(/[a-z]/.test(v)) score++;
+      if(/[0-9]/.test(v)) score++;
+      if(/[^A-Za-z0-9]/.test(v)) score++;
+      var pct = Math.round((score/6)*100);
+      var tier = score <= 2 ? "Weak" : score <= 4 ? "Fair" : "Strong";
+      var color = score <= 2 ? "var(--fail)" : score <= 4 ? "var(--core)" : "var(--pass)";
+      barFill.style.width = pct + "%";
+      barFill.style.background = color;
+      label.textContent = v ? (tier + " (" + score + "/6 checks passed)\n\nIllustrative hash: " + hash(v)) : "";
+    });
+  };
+
+  /* ---- Contrast checker ---- */
+  DEMOS.contrast = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Text needs enough contrast against its background to be readable. This checks against WCAG guidelines.")]));
+    var fg = el("input", {type:"color", value:"#E7E9EE"});
+    var bg = el("input", {type:"color", value:"#1B1F26"});
+    var row = el("div", {class:"row-flex"}, [
+      el("label", {class:"small"}, [document.createTextNode("Text "), fg]),
+      el("label", {class:"small"}, [document.createTextNode("Background "), bg])
+    ]);
+    root.appendChild(row);
+    var preview = el("div", {style:"margin-top:12px; padding:16px; border-radius:8px; font-size:15px;"}, [document.createTextNode("The quick brown fox jumps over the lazy dog.")]);
+    root.appendChild(preview);
+    var out = el("div", {class:"demo-log"});
+    root.appendChild(out);
+    function luminance(hex){
+      var c = hex.slice(1).match(/.{2}/g).map(function(h){
+        var v = parseInt(h,16)/255;
+        return v <= 0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4);
+      });
+      return 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2];
+    }
+    function update(){
+      preview.style.color = fg.value;
+      preview.style.background = bg.value;
+      var L1 = luminance(fg.value), L2 = luminance(bg.value);
+      var lighter = Math.max(L1,L2), darker = Math.min(L1,L2);
+      var ratio = (lighter + 0.05) / (darker + 0.05);
+      var aaNormal = ratio >= 4.5, aaLarge = ratio >= 3;
+      out.innerHTML = "";
+      out.appendChild(document.createTextNode("Contrast ratio: " + ratio.toFixed(2) + ":1\n"));
+      var b1 = el("span", {class:"badge " + (aaNormal ? "pass" : "fail")}, [document.createTextNode("AA normal text " + (aaNormal ? "pass" : "fail"))]);
+      var b2 = el("span", {class:"badge " + (aaLarge ? "pass" : "fail"), style:"margin-left:8px;"}, [document.createTextNode("AA large text " + (aaLarge ? "pass" : "fail"))]);
+      out.appendChild(b1); out.appendChild(b2);
+    }
+    fg.addEventListener("input", update);
+    bg.addEventListener("input", update);
+    update();
+  };
+
+  /* ---- Wireframe to prototype ---- */
+  DEMOS.wireframe = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("The same screen, three ways: rough structure, labeled layout, then a finished look.")]));
+    var stages = ["Wireframe", "Mid-fidelity", "High-fidelity"];
+    var idx = 0;
+    var frame = el("div", {style:"border:1px solid var(--line); border-radius:10px; padding:16px; margin-top:12px; background:var(--ink); min-height:160px;"});
+    root.appendChild(frame);
+    var nav = el("div", {class:"row-flex", style:"margin-top:12px;"});
+    var prev = el("button", {class:"btn secondary"}, [document.createTextNode("← Back")]);
+    var next = el("button", {class:"btn"}, [document.createTextNode("Next stage →")]);
+    var label = el("span", {class:"badge", style:"background:var(--panel-2); color:var(--muted);"});
+    nav.appendChild(prev); nav.appendChild(next); nav.appendChild(label);
+    root.appendChild(nav);
+    function render(){
+      frame.innerHTML = "";
+      label.textContent = stages[idx];
+      prev.disabled = idx === 0;
+      next.disabled = idx === stages.length - 1;
+      if(idx === 0){
+        frame.appendChild(el("div", {style:"height:14px; background:var(--line); border-radius:3px; width:40%; margin-bottom:10px;"}));
+        frame.appendChild(el("div", {style:"height:70px; background:var(--line); border-radius:3px; margin-bottom:10px;"}));
+        frame.appendChild(el("div", {style:"height:20px; background:var(--line); border-radius:3px; width:30%;"}));
+      } else if(idx === 1){
+        frame.appendChild(el("div", {style:"font-size:12px; color:var(--muted); border:1px dashed var(--line); padding:8px; margin-bottom:10px;"}, [document.createTextNode("[ Course title ]")]));
+        frame.appendChild(el("div", {style:"font-size:12px; color:var(--muted); border:1px dashed var(--line); padding:20px; margin-bottom:10px;"}, [document.createTextNode("[ Video player area ]")]));
+        frame.appendChild(el("div", {style:"font-size:12px; color:var(--muted); border:1px dashed var(--line); padding:8px; width:120px;"}, [document.createTextNode("[ Continue button ]")]));
+      } else {
+        frame.appendChild(el("div", {style:"font-family:'Space Grotesk'; font-size:17px; margin-bottom:10px;"}, [document.createTextNode("Intro to Python — Lesson 4")]));
+        frame.appendChild(el("div", {style:"height:70px; background:linear-gradient(135deg, var(--design), var(--python)); border-radius:6px; margin-bottom:10px;"}));
+        frame.appendChild(el("button", {class:"btn"}, [document.createTextNode("Continue")]));
+      }
+    }
+    prev.addEventListener("click", function(){ if(idx>0){ idx--; render(); } });
+    next.addEventListener("click", function(){ if(idx<stages.length-1){ idx++; render(); } });
+    render();
+  };
+
+  /* ---- CI/CD pipeline ---- */
+  DEMOS.cicd = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Pushing code can trigger an automatic pipeline: build it, test it, then deploy it — and stop if any step fails.")]));
+    var failToggle = el("label", {class:"small"}, [
+      el("input", {type:"checkbox", id:"failChk"}),
+      document.createTextNode("Simulate a failing test")
+    ]);
+    root.appendChild(failToggle);
+    var stageRow = el("div", {class:"stage-row"});
+    var stageEls = ["Build","Test","Deploy"].map(function(s){
+      var e = el("div", {class:"stage"}, [document.createTextNode(s)]);
+      stageRow.appendChild(e);
+      return e;
+    });
+    root.appendChild(stageRow);
+    var log = el("div", {class:"demo-log"}, [document.createTextNode("Ready to push.")]);
+    var btn = el("button", {class:"btn"}, [document.createTextNode("Push code")]);
+    root.appendChild(btn);
+    root.appendChild(log);
+    btn.addEventListener("click", function(){
+      btn.disabled = true;
+      stageEls.forEach(function(e){ e.className = "stage"; });
+      var shouldFail = document.getElementById("failChk").checked;
+      log.textContent = "Pipeline triggered by push.";
+      setTimeout(function(){
+        stageEls[0].className = "stage pass"; log.textContent += "\n✓ Build succeeded";
+        setTimeout(function(){
+          if(shouldFail){
+            stageEls[1].className = "stage fail";
+            log.textContent += "\n✗ Test failed — pipeline stopped";
+            btn.disabled = false;
+          } else {
+            stageEls[1].className = "stage pass"; log.textContent += "\n✓ Tests passed";
+            setTimeout(function(){
+              stageEls[2].className = "stage pass"; log.textContent += "\n✓ Deployed to production";
+              btn.disabled = false;
+            }, 700);
+          }
+        }, 700);
+      }, 700);
+    });
+  };
+
+  /* ---- Docker lifecycle ---- */
+  DEMOS.docker = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("A container moves through a small set of states. Only certain actions make sense at each step.")]));
+    var state = "none";
+    var status = el("div", {class:"stage active"}, [document.createTextNode("No image built")]);
+    root.appendChild(status);
+    var log = el("div", {class:"demo-log"});
+    var buildBtn = el("button", {class:"btn"}, [document.createTextNode("docker build")]);
+    var runBtn = el("button", {class:"btn secondary"}, [document.createTextNode("docker run")]);
+    var stopBtn = el("button", {class:"btn secondary"}, [document.createTextNode("docker stop")]);
+    var rmBtn = el("button", {class:"btn secondary"}, [document.createTextNode("docker rm")]);
+    root.appendChild(el("div", {class:"row-flex"}, [buildBtn, runBtn, stopBtn, rmBtn]));
+    root.appendChild(log);
+    function setState(s, text, msg){
+      state = s;
+      status.textContent = text;
+      log.textContent += (log.textContent ? "\n" : "") + msg;
+      updateButtons();
+    }
+    function updateButtons(){
+      buildBtn.disabled = state !== "none" && state !== "removed";
+      runBtn.disabled = state !== "built";
+      stopBtn.disabled = state !== "running";
+      rmBtn.disabled = state !== "stopped";
+    }
+    buildBtn.addEventListener("click", function(){ setState("built", "Image built", "$ docker build -t course-app .\nImage built."); });
+    runBtn.addEventListener("click", function(){ setState("running", "Container running", "$ docker run course-app\nContainer started."); });
+    stopBtn.addEventListener("click", function(){ setState("stopped", "Container stopped", "$ docker stop\nContainer stopped."); });
+    rmBtn.addEventListener("click", function(){ setState("removed", "Container removed", "$ docker rm\nContainer removed."); });
+    updateButtons();
+  };
+
+  /* ---- AWS S3 permissions ---- */
+  DEMOS.s3 = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("A storage bucket's visibility setting decides who is allowed to read what's inside it.")]));
+    var isPublic = false;
+    var toggle = el("label", {class:"small"}, [
+      el("input", {type:"checkbox", onchange:function(e){ isPublic = e.target.checked; render(); }}),
+      document.createTextNode("Make bucket public")
+    ]);
+    root.appendChild(toggle);
+    var list = el("div", {class:"demo-log"});
+    root.appendChild(list);
+    var requesters = [
+      {name:"Anonymous visitor", rule:function(){ return isPublic; }, note:"Only allowed if the bucket is public."},
+      {name:"Your logged-in app", rule:function(){ return true; }, note:"Allowed either way — it has a proper IAM role."},
+      {name:"Random stranger's script", rule:function(){ return isPublic; }, note:"Same access as any anonymous visitor."}
+    ];
+    function render(){
+      list.innerHTML = "";
+      requesters.forEach(function(r){
+        var allowed = r.rule();
+        var line = el("div", {style:"margin-bottom:10px;"}, [
+          document.createTextNode(r.name + "  "),
+          el("span", {class:"badge " + (allowed ? "pass" : "fail")}, [document.createTextNode(allowed ? "Allowed" : "Denied")]),
+          el("div", {style:"color:var(--muted-2); font-size:12px; margin-top:2px;"}, [document.createTextNode(r.note)])
+        ]);
+        list.appendChild(line);
+      });
+    }
+    render();
+  };
+
+  /* ---- List vs dict lookup ---- */
+  DEMOS.listdict = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Finding an item in a list means checking items one by one. A dictionary can jump straight there.")]));
+    var items = ["ada","ben","cy","dee","eli","fay","gus","hana"];
+    var target = "gus";
+    root.appendChild(el("p", {style:"color:var(--muted); font-size:13px;"}, [document.createTextNode('Searching for "' + target + '"')]));
+    var listBoxes = el("div", {class:"grid-boxes"});
+    var dictBoxes = el("div", {class:"grid-boxes"});
+    items.forEach(function(v){ listBoxes.appendChild(el("div", {class:"box"}, [document.createTextNode(v)])); });
+    items.forEach(function(v){ dictBoxes.appendChild(el("div", {class:"box"}, [document.createTextNode(v)])); });
+    root.appendChild(el("div", {style:"font-size:12.5px; color:var(--muted); margin-top:10px;"}, [document.createTextNode("List — checked one at a time:")]));
+    root.appendChild(listBoxes);
+    root.appendChild(el("div", {style:"font-size:12.5px; color:var(--muted); margin-top:10px;"}, [document.createTextNode("Dictionary — looked up by key:")]));
+    root.appendChild(dictBoxes);
+    var log = el("div", {class:"demo-log"});
+    var btn = el("button", {class:"btn", style:"margin-top:10px;"}, [document.createTextNode("Run both searches")]);
+    root.appendChild(btn);
+    root.appendChild(log);
+    btn.addEventListener("click", function(){
+      btn.disabled = true;
+      Array.prototype.forEach.call(listBoxes.children, function(b){ b.className = "box"; });
+      Array.prototype.forEach.call(dictBoxes.children, function(b){ b.className = "box"; });
+      var i = 0;
+      var interval = setInterval(function(){
+        if(i > 0) listBoxes.children[i-1].className = "box";
+        if(items[i] === target){
+          listBoxes.children[i].className = "box match";
+          clearInterval(interval);
+          dictBoxes.children[items.indexOf(target)].className = "box match";
+          log.textContent = "List search: " + (i+1) + " step(s) to find it.\nDictionary search: 1 step — jumped straight to the key.";
+          btn.disabled = false;
+        } else {
+          listBoxes.children[i].className = "box check-hit";
+          i++;
+        }
+      }, 220);
+    });
+  };
+
+  /* ---- Data types playground ---- */
+  DEMOS.types = function(root){
+    root.appendChild(el("p", {}, [document.createTextNode("Type a value the way you'd write it in Python and see what type it would be treated as.")]));
+    var input = el("input", {class:"field", placeholder:"Try: 42, 3.14, True, hello, [1, 2, 3]"});
+    root.appendChild(input);
+    var out = el("div", {class:"demo-log"});
+    root.appendChild(out);
+    var descriptions = {
+      int:"A whole number, positive or negative.",
+      float:"A number with a decimal point.",
+      bool:"One of exactly two values: True or False.",
+      list:"An ordered, changeable collection of values.",
+      dict:"A collection of key-value pairs.",
+      str:"Text — anything Python doesn't recognize as another type."
+    };
+    input.addEventListener("input", function(){
+      var v = input.value.trim();
+      if(!v){ out.textContent = ""; return; }
+      var t;
+      if(v === "True" || v === "False") t = "bool";
+      else if(/^-?\d+$/.test(v)) t = "int";
+      else if(/^-?\d*\.\d+$/.test(v)) t = "float";
+      else if(v.startsWith("[") && v.endsWith("]")) t = "list";
+      else if(v.startsWith("{") && v.endsWith("}")) t = "dict";
+      else t = "str";
+      out.textContent = "type(" + v + ")\n→ <class '" + t + "'>\n\n" + descriptions[t];
+    });
+  };
+
+})();
+</script>
+</body>
+</html>
