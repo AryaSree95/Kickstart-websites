@@ -1,0 +1,436 @@
+<title>One Order, Eight Careers</title>
+<meta name="color-scheme" content="light only">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Light mode only — the page stays light even when the viewer's device is in dark mode */
+:root,:root[data-theme="dark"],:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f8f9fb;
+  --surface:#ffffff;
+  --ink:#0f1f45;
+  --body:#5a6378;
+  --text:#2f3a52;
+  --muted:#8a93a6;
+  --line:#e6e9ef;
+  --line-soft:#f3f5f8;
+  --accent:#2a62b8;
+  --logo:#2b5fb3;
+  --tab-active:#0f2352;
+  --amber:#e8a73a;
+  --shadow:0 1px 2px rgba(15,31,69,.04),0 8px 24px rgba(15,31,69,.04);
+
+  --c-ux:#d6457f;   --t-ux:#fcebf2;
+  --c-mern:#2563c9; --t-mern:#e8f0fc;
+  --c-py:#3b8f47;   --t-py:#e7f4e9;
+  --c-qa:#d9962a;   --t-qa:#fcf2dc;
+  --c-sec:#d64545;  --t-sec:#fce9e9;
+  --c-ops:#ea7317;  --t-ops:#fdeede;
+  --c-da:#1a927c;   --t-da:#e2f3ef;
+  --c-ds:#7457e8;   --t-ds:#efebfd;
+
+  --serif:"DM Serif Display",Georgia,"Times New Roman",serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1340px;margin:0 auto;padding-inline:24px;padding-block:28px 72px}
+
+/* Logo */
+.logo{display:inline-flex;align-items:center;text-decoration:none}
+.logo img{display:block;height:40px;width:auto}
+
+/* Hero */
+.eyebrow{margin:22px 0 6px;font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{margin:0;font-family:var(--serif);font-weight:400;color:var(--ink);font-size:clamp(34px,5vw,48px);line-height:1.12;letter-spacing:-.2px;text-wrap:balance}
+.lede{margin:14px 0 0;max-width:66ch;color:var(--body);font-size:16.5px;line-height:1.75}
+.lede b{color:var(--ink);font-weight:600}
+
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;padding:0;list-style:none}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font:500 13.5px/1.4 var(--sans);color:var(--ink);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.chip:hover{border-color:var(--c)}
+.chip[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 0 3px var(--t)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
+.chip-hint{margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+.chip-hint button{border:0;background:none;color:var(--accent);font:inherit;cursor:pointer;padding:0;text-decoration:underline}
+
+.divider{height:1px;background:var(--line);margin:26px 0 0;border:0}
+
+/* Tabs */
+.tabs{display:flex;gap:10px;overflow-x:auto;padding:28px 2px 12px;scrollbar-width:thin;scrollbar-color:#9aa1ad transparent}
+.tabs::-webkit-scrollbar{height:8px}
+.tabs::-webkit-scrollbar-thumb{background:#9aa1ad;border-radius:8px}
+.tab{flex:none;display:inline-flex;align-items:center;gap:10px;padding:8px 18px 8px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--text);font:500 15px/1.3 var(--sans);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s}
+.tab:hover{border-color:#c9d2e2}
+.num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#eaf1fb;color:var(--accent);font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.tab[aria-selected="true"]{background:var(--tab-active);border-color:var(--tab-active);color:#fff;font-weight:600}
+.tab[aria-selected="true"] .num{background:var(--amber);color:var(--tab-active)}
+
+.progress{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin:18px 2px 0}
+.progress span{height:4px;border-radius:4px;background:var(--line);transition:background .25s}
+.progress span.on{background:var(--amber)}
+
+/* Step panel */
+.panel{margin-top:34px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:48px 48px 40px;box-shadow:var(--shadow)}
+.step-head{display:flex;gap:22px;align-items:flex-start}
+.step-icon{flex:none;width:70px;height:70px;border-radius:16px;background:#eaf1fb;display:grid;place-items:center;font-size:36px}
+.step-kicker{margin:4px 0 0;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.step-title{margin:2px 0 0;font-family:var(--serif);font-weight:400;font-size:clamp(28px,3.4vw,36px);line-height:1.15;color:var(--ink);text-wrap:balance}
+.step-desc{margin:8px 0 0;color:var(--body);font-size:16.5px}
+
+.lane{margin-top:34px}
+.lane + .lane{margin-top:26px}
+.lane-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 12px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lane-label em{font-style:normal;letter-spacing:0;text-transform:none;font-weight:400;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.card{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--surface);display:flex;flex-direction:column;transition:opacity .2s,border-color .2s,box-shadow .2s,transform .2s}
+.card-head{display:flex;align-items:center;gap:12px}
+.card-icon{width:42px;height:42px;border-radius:10px;background:var(--t);display:grid;place-items:center;font-size:21px;flex:none}
+.card-role{margin:0;font-size:15.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.card-body{margin:16px 0 0;font-size:15.5px;line-height:1.65;color:var(--text)}
+.grid.filtering .card{opacity:.38}
+.grid.filtering .card.hit{opacity:1;border-color:var(--c);box-shadow:0 0 0 3px var(--t);transform:translateY(-2px)}
+
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:34px;padding-top:24px;border-top:1px solid var(--line)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 14px/1 var(--sans);cursor:pointer}
+.btn:hover{border-color:#c9d2e2}
+.btn.primary{background:var(--tab-active);border-color:var(--tab-active);color:#fff}
+.btn[disabled]{opacity:.4;cursor:default}
+.nav-note{font-size:13px;color:var(--muted);text-align:center}
+
+/* Sections below */
+.section{margin-top:72px}
+.section .eyebrow{margin-top:0}
+h2{margin:0;font-family:var(--serif);font-weight:400;color:var(--ink);font-size:clamp(28px,3.6vw,38px);line-height:1.15;text-wrap:balance}
+.section .lede{margin-top:10px}
+.roles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:28px}
+.role{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:auto 1fr;gap:4px 16px}
+.role .card-icon{grid-row:span 2;width:48px;height:48px;font-size:24px}
+.role h3{margin:0;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3;align-self:end}
+.role .course{margin:0;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--c)}
+.role-body{grid-column:1/-1;margin-top:12px}
+.role-body p{margin:0;font-size:15px;color:var(--text)}
+.like{margin-top:12px!important;padding:10px 14px;border-radius:10px;background:var(--line-soft);color:var(--body)!important;font-size:14px!important}
+.like b{color:var(--ink);font-weight:600}
+.role dl{margin:14px 0 0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:13.5px}
+.role dt{color:var(--muted);font-weight:500}
+.role dd{margin:0;color:var(--text)}
+
+.relay{margin-top:72px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:40px 48px}
+.relay-list{list-style:none;margin:24px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 24px}
+.relay-list .q{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink)}
+.relay-list .a{margin:6px 0 20px;font-size:14px;color:var(--body);line-height:1.55}
+.relay-list .a strong{display:block;color:var(--ink);font-weight:600}
+.foot{margin-top:40px;font-size:13px;color:var(--muted);text-align:center}
+
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+@media (max-width:1100px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .relay-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px){
+  .wrap{padding-inline:16px}
+  .panel{padding:26px 18px 24px;border-radius:18px}
+  .relay{padding:28px 20px}
+  .step-head{gap:14px}
+  .step-icon{width:54px;height:54px;font-size:28px;border-radius:14px}
+  .roles,.grid,.relay-list{grid-template-columns:1fr}
+  .nav-note{display:none}
+}
+</style>
+
+<div class="wrap">
+  <a class="logo" href="#top">
+    <img src="logo.svg" alt="entri" width="109" height="40">
+  </a>
+
+  <p class="eyebrow" id="top">Program Deep-Dive · Real-World Workflow</p>
+  <h1>One Order, Eight Careers</h1>
+  <p class="lede">Ever wondered how many people it takes to get your food delivered through an app? Follow one order on <b>FoodNow</b>, a food delivery app, from the moment Priya opens the app to the moment she rates her meal. At every step, <b>eight different people</b> are quietly doing eight different jobs. No tech knowledge needed — just follow the order.</p>
+
+  <ul class="chips" id="chips"></ul>
+  <p class="chip-hint">Tap a role to see what that person does at every step. <button type="button" id="clearFilter" hidden>Show all roles</button></p>
+
+  <hr class="divider">
+
+  <div class="tabs" role="tablist" aria-label="Order journey steps" id="tabs"></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <section class="panel" id="panel" role="tabpanel" aria-live="polite"></section>
+
+  <section class="relay">
+    <p class="eyebrow">How the team works together</p>
+    <h2>The one question each person answers</h2>
+    <p class="lede">Every new feature in the app passes through all eight people, like a relay race. Each one answers a single question before passing it on.</p>
+    <ol class="relay-list" id="relay"></ol>
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">The roles at a glance</p>
+    <h2>Meet the eight careers behind every order</h2>
+    <p class="lede">What each person does, an everyday way to picture the job, and the Entri course that can get you there.</p>
+    <div class="roles" id="roles"></div>
+  </section>
+
+  <p class="foot">FoodNow, Priya and Rahul are made-up examples used to explain real job roles.</p>
+</div>
+
+<script>
+const ROLES = [
+  {id:"ux",   name:"UI/UX Designer",            icon:"🎨", lane:0, course:"UI/UX Design",
+   q:"How should it look, and is it easy to use?", a:"Plans and draws every screen before anything is built.",
+   one:"Decides how the app looks and feels — every screen, button and message — so anyone can use it without getting confused.",
+   like:"an architect who draws the plan of a house before anyone starts building.",
+   tools:"Figma (a drawing tool for app screens)"},
+  {id:"mern", name:"Full Stack MERN Developer", icon:"💻", lane:0, course:"Full Stack MERN",
+   q:"How do we turn the design into a working app?", a:"Builds the screens you see and the parts behind them that save your data.",
+   one:"Turns the designer's drawings into a real, working app — both the part you see and tap, and the hidden part that stores and fetches information.",
+   like:"a builder who puts up the walls and rooms you see, plus the wiring and pipes hidden behind them.",
+   tools:"MongoDB, Express, React, Node.js — the four tools the name “MERN” comes from"},
+  {id:"py",   name:"Python Developer",          icon:"🐍", lane:0, course:"Python Programming",
+   q:"What should happen automatically behind the scenes?", a:"Writes the rules and automatic programs that do work without anyone clicking.",
+   one:"Writes programs that work quietly in the background — calculating bills, applying coupons, paying people, sorting information — so no one has to do it by hand.",
+   like:"the kitchen staff behind the counter — you never see them, but nothing gets served without them.",
+   tools:"Python (a beginner-friendly programming language)"},
+  {id:"qa",   name:"Software Tester",           icon:"🧪", lane:0, course:"Software Testing",
+   q:"Does it really work — every single time?", a:"Tries hard to break the app before real customers use it.",
+   one:"Checks that everything works correctly by trying every button and every tricky situation, and reports problems (bugs) so they get fixed before customers see them.",
+   like:"a food taster who checks every dish before it leaves the kitchen.",
+   tools:"Test checklists, plus tools like Selenium that test the app automatically"},
+  {id:"sec",  name:"Cybersecurity Analyst",     icon:"🛡️", lane:1, course:"Cybersecurity",
+   q:"Can someone cheat, hack or steal from it?", a:"Keeps customers' money and personal details safe from hackers.",
+   one:"Protects the app and its users from hackers, cheaters and data theft — finding weak spots first and reacting fast when something looks wrong.",
+   like:"the security guard, locks and CCTV cameras that keep a shop safe.",
+   tools:"Security scanners, firewalls and hacking-test tools used the right way"},
+  {id:"ops",  name:"DevOps & AWS Engineer",     icon:"☁️", lane:1, course:"DevOps & AWS",
+   q:"How do we put it online and keep it running?", a:"Releases updates safely and keeps the app fast and working 24/7.",
+   one:"Puts the app online for millions of people and keeps it running smoothly day and night, using rented computers from Amazon's cloud (AWS).",
+   like:"the team that keeps a mall's electricity, lifts and doors working so it never has to close.",
+   tools:"AWS (Amazon's cloud), Docker, and automatic release pipelines"},
+  {id:"da",   name:"Data Analyst",              icon:"📊", lane:1, course:"Data Analytics",
+   q:"What is happening, and why?", a:"Turns numbers into simple charts that help the team decide what to do.",
+   one:"Studies the numbers — orders, ratings, delays — and turns them into easy charts and reports that tell the team what's working and what needs fixing.",
+   like:"a shop accountant who reads the sales book and says “samosas sell best on rainy days”.",
+   tools:"Excel, SQL (for asking questions of data) and Power BI (for charts)"},
+  {id:"ds",   name:"Data Scientist",            icon:"🤖", lane:1, course:"Data Science",
+   q:"Can we predict what will happen next?", a:"Teaches computers to learn from past data and make smart guesses.",
+   one:"Teaches the computer to learn from past data so it can make smart predictions — what you'll like, when food will arrive, which payment is fraud.",
+   like:"a weather forecaster who studies past patterns to predict tomorrow.",
+   tools:"Python and machine learning (teaching computers from examples)"}
+];
+const LANES = [
+  {label:"Make the app", note:"They design it, build it and check it"},
+  {label:"Protect, run & improve", note:"They keep it safe, keep it online and learn from the numbers"}
+];
+
+const STEPS = [
+ {title:"Discover & Browse", icon:"🔍",
+  desc:"Priya is hungry. She opens the FoodNow app to see which restaurants are nearby.",
+  r:{
+   ux:"Decides how the home screen looks — where the food photos, search bar and buttons go — so Priya finds food easily.",
+   mern:"Builds the home screen Priya sees and makes it show the restaurants that are close to her.",
+   py:"Writes the search, so when Priya types “biriyani” — even with a spelling mistake — she still gets the right results.",
+   qa:"Checks that restaurants load, search works, and the app looks right on every phone.",
+   sec:"Stops fake robot visitors from copying all of FoodNow's restaurant and price information.",
+   ops:"Keeps the app fast even when thousands of people open it at lunchtime, using Amazon's cloud (AWS).",
+   da:"Counts which foods people look at the most and shares a simple report with the team.",
+   ds:"Teaches the app to guess what Priya might like, so she sees a “Recommended for you” list."
+  }},
+ {title:"Place Order", icon:"🛒",
+  desc:"She adds a biryani and a cold drink to her cart, applies a discount coupon and taps Place Order.",
+  r:{
+   ux:"Designs the cart page so Priya clearly sees the price, delivery fee and how much the coupon saved her.",
+   mern:"Makes the “Add to cart” and “Place Order” buttons work, and saves her order.",
+   py:"Writes the coupon rules — like “50% off on orders above ₹199” — and calculates the final bill.",
+   qa:"Tries tricky situations: an expired coupon, an item that just sold out, tapping Place Order twice.",
+   sec:"Makes sure nobody can trick the app into charging ₹1 instead of the real price.",
+   ops:"Releases the new cart page to all users safely — and can undo it in one click if something goes wrong.",
+   da:"Finds out how many people leave the cart page without ordering, and why.",
+   ds:"Predicts which coupon will actually make each person order, so discounts aren't wasted."
+  }},
+ {title:"Payment", icon:"💳",
+  desc:"Priya pays ₹349 using UPI. The money must move safely, in seconds.",
+  r:{
+   ux:"Designs clear messages like “Payment successful” or “Payment failed — no money was deducted” so she never panics.",
+   mern:"Connects the app to the payment service, and marks the order as paid once the money arrives.",
+   py:"Writes a program that checks every night that each payment matches what the bank actually received.",
+   qa:"Tests what happens if the payment fails, the internet drops halfway, or a refund is needed.",
+   sec:"Keeps Priya's bank and card details locked and hidden so hackers can't steal them.",
+   ops:"Keeps the app's secret payment passwords safe and gets an alert if payments start failing.",
+   da:"Compares which payment methods — UPI, card or wallet — fail most often.",
+   ds:"Spots payments that look like fraud, such as a stolen card, and blocks them instantly."
+  }},
+ {title:"Order Confirmed & Kitchen Prep", icon:"👨‍🍳",
+  desc:"The restaurant receives the order and starts cooking.",
+  r:{
+   ux:"Designs the restaurant's app with big buttons and loud alerts that work even in a noisy kitchen.",
+   mern:"Sends the order to the restaurant's screen instantly, and changes Priya's app to show “Preparing”.",
+   py:"Writes a program that automatically sends Priya her order confirmation message and bill.",
+   qa:"Tests the app with thousands of orders at the same time to make sure no order gets lost.",
+   sec:"Makes sure only that restaurant's staff can log in and see its orders.",
+   ops:"Adds more servers (the computers that run the app) automatically so it doesn't crash during the dinner rush.",
+   da:"Tracks how long each restaurant takes to cook and points out the slow ones.",
+   ds:"Predicts how long this food will take to cook, so the delivery time shown to Priya is accurate."
+  }},
+ {title:"Delivery Partner Assigned", icon:"🛵",
+  desc:"The app finds a delivery rider, Rahul, close to the restaurant.",
+  r:{
+   ux:"Designs the rider's app so Rahul can see the address and route with one quick look while on his bike.",
+   mern:"Builds the feature that finds riders near the restaurant and sends them the pickup request.",
+   py:"Writes the logic that picks the best rider — close by, well rated, and fair to all riders.",
+   qa:"Tests what happens if a rider says no or their phone goes offline — the order must go to someone else.",
+   sec:"Hides real phone numbers, so Priya and Rahul can call each other without seeing each other's number.",
+   ops:"Runs the app in more than one place, so it keeps working even if one data centre has a problem.",
+   da:"Shows which areas don't have enough riders during busy hours.",
+   ds:"Predicts where orders will come from in the next 30 minutes, so riders wait in the right places."
+  }},
+ {title:"Real-Time Tracking", icon:"📍",
+  desc:"Priya watches Rahul moving towards her home on the map.",
+  r:{
+   ux:"Designs the live map and friendly updates like “Rahul is 2 minutes away”.",
+   mern:"Shows Rahul's live location moving on the map inside Priya's app.",
+   py:"Cleans up jumpy GPS signals so the bike icon moves smoothly along real roads.",
+   qa:"Tests tracking with slow internet and weak signal to make sure the map still works.",
+   sec:"Makes sure Rahul's location is shared only with Priya, and only until the food arrives.",
+   ops:"Watches the system 24/7 and gets an alert straight away if tracking stops working.",
+   da:"Compares the promised delivery time with the actual time to see where delays happen.",
+   ds:"Keeps updating the arrival time using live traffic and thousands of past trips."
+  }},
+ {title:"Delivered", icon:"🍱",
+  desc:"Rahul hands over the food. Order complete!",
+  r:{
+   ux:"Designs a happy “Order delivered” screen and an easy way to report a missing item.",
+   mern:"Checks the delivery code Priya gives Rahul, closes the order and adds Rahul's earnings to his account.",
+   py:"Writes a program that pays every rider and restaurant automatically at the end of the day.",
+   qa:"Tests the whole journey — from opening the app to delivery — before every new app update is released.",
+   sec:"Watches for people who falsely say “my food never came” just to get free refunds.",
+   ops:"Makes backup copies of every order, so nothing is lost even if a server breaks.",
+   da:"Reports how many orders arrived on time today and how much each delivery cost.",
+   ds:"Learns the patterns of fake refund requests so the app can catch them automatically."
+  }},
+ {title:"Rating & Feedback", icon:"⭐",
+  desc:"Priya gives 5 stars and writes, “Tasty, but a little cold.”",
+  r:{
+   ux:"Reads feedback like “a little cold” and improves the design in the next update.",
+   mern:"Builds the star rating and review feature, and updates the restaurant's rating on the home screen.",
+   py:"Collects all new reviews every hour and removes spam automatically.",
+   qa:"Turns problems customers complain about into bug reports and checks they really get fixed.",
+   sec:"Blocks fake reviews and tests the app for weak spots before hackers can find them.",
+   ops:"Uses what happened today to get the servers ready for big days like festival sales.",
+   da:"Makes a simple chart of ratings and explains to the team why ratings dropped in one city.",
+   ds:"Reads thousands of reviews automatically to find the most common complaint — like “cold food”."
+  }}
+];
+
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const vars = r => `--c:var(--c-${r.id});--t:var(--t-${r.id})`;
+
+let current = 0, filter = null;
+try { const s = JSON.parse(localStorage.getItem("oo8") || "{}"); if (Number.isInteger(s.step) && s.step >= 0 && s.step < STEPS.length) current = s.step; } catch (e) {}
+
+// role chips
+$("#chips").innerHTML = ROLES.map(r =>
+  `<li><button type="button" class="chip" id="chip-${r.id}" data-role="${r.id}" aria-pressed="false" style="${vars(r)}"><span class="dot"></span>${esc(r.name)}</button></li>`).join("");
+$("#chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  setFilter(filter === b.dataset.role ? null : b.dataset.role);
+});
+$("#clearFilter").addEventListener("click", () => setFilter(null));
+
+function setFilter(id){
+  filter = id;
+  document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c.dataset.role === id ? "true" : "false"));
+  $("#clearFilter").hidden = !id;
+  applyFilter();
+}
+function applyFilter(){
+  document.querySelectorAll(".grid").forEach(g => {
+    g.classList.toggle("filtering", !!filter);
+    g.querySelectorAll(".card").forEach(c => c.classList.toggle("hit", c.dataset.role === filter));
+  });
+}
+
+// tabs + progress
+$("#tabs").innerHTML = STEPS.map((s,i) =>
+  `<button type="button" class="tab" role="tab" id="tab-${i}" data-i="${i}" aria-controls="panel"><span class="num">${i+1}</span>${esc(s.title)}</button>`).join("");
+$("#progress").innerHTML = STEPS.map(() => "<span></span>").join("");
+$("#tabs").addEventListener("click", e => { const t = e.target.closest(".tab"); if (t) go(+t.dataset.i); });
+$("#tabs").addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+    e.preventDefault();
+    go(Math.max(0, Math.min(STEPS.length-1, current + (e.key === "ArrowRight" ? 1 : -1))));
+    document.getElementById("tab-"+current).focus();
+  }
+});
+
+function card(r, s){
+  return `<article class="card" data-role="${r.id}" style="${vars(r)}">
+    <div class="card-head"><span class="card-icon" aria-hidden="true">${r.icon}</span><h3 class="card-role">${esc(r.name)}</h3></div>
+    <p class="card-body">${esc(s.r[r.id])}</p>
+  </article>`;
+}
+
+function render(){
+  const s = STEPS[current];
+  document.querySelectorAll(".tab").forEach((t,i) => {
+    t.setAttribute("aria-selected", i === current ? "true" : "false");
+    t.tabIndex = i === current ? 0 : -1;
+  });
+  document.querySelectorAll("#progress span").forEach((p,i) => p.classList.toggle("on", i <= current));
+  const lanes = LANES.map((l,li) => `
+    <div class="lane">
+      <p class="lane-label">${esc(l.label)} <em>— ${esc(l.note)}</em></p>
+      <div class="grid">${ROLES.filter(r => r.lane === li).map(r => card(r, s)).join("")}</div>
+    </div>`).join("");
+  const next = STEPS[current+1];
+  $("#panel").setAttribute("aria-labelledby", "tab-"+current);
+  $("#panel").innerHTML = `
+    <div class="step-head">
+      <div class="step-icon" aria-hidden="true">${s.icon}</div>
+      <div>
+        <p class="step-kicker">Step ${current+1} of ${STEPS.length}</p>
+        <h2 class="step-title">${esc(s.title)}</h2>
+        <p class="step-desc">${esc(s.desc)}</p>
+      </div>
+    </div>
+    ${lanes}
+    <div class="nav">
+      <button type="button" class="btn" id="prevBtn" ${current===0?"disabled":""}>← Previous</button>
+      <span class="nav-note">${next ? "Next: " + esc(next.title) : "Priya's rating helps the app recommend better food next time."}</span>
+      <button type="button" class="btn primary" id="nextBtn">${next ? "Next step →" : "Start again ↺"}</button>
+    </div>`;
+  $("#prevBtn").onclick = () => go(current-1, true);
+  $("#nextBtn").onclick = () => go(next ? current+1 : 0, true);
+  applyFilter();
+  const tab = document.getElementById("tab-"+current), bar = $("#tabs");
+  bar.scrollTo({left: tab.offsetLeft - bar.offsetLeft - 24, behavior: "smooth"});
+  try { localStorage.setItem("oo8", JSON.stringify({step: current})); } catch (e) {}
+}
+function go(i, scroll){
+  current = i; render();
+  if (scroll) $("#tabs").scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+// relay + roles
+$("#relay").innerHTML = ROLES.map(r =>
+  `<li style="${vars(r)}"><div class="q"><span class="dot"></span>${esc(r.name)}</div><p class="a"><strong>${esc(r.q)}</strong>${esc(r.a)}</p></li>`).join("");
+$("#roles").innerHTML = ROLES.map(r => `
+  <article class="role" style="${vars(r)}">
+    <span class="card-icon" aria-hidden="true">${r.icon}</span>
+    <h3>${esc(r.name)}</h3>
+    <p class="course">Entri course · ${esc(r.course)}</p>
+    <div class="role-body">
+      <p>${esc(r.one)}</p>
+      <p class="like"><b>Think of them as</b> ${esc(r.like)}</p>
+      <dl><dt>Tools</dt><dd>${esc(r.tools)}</dd></dl>
+    </div>
+  </article>`).join("");
+
+render();
+</script>
